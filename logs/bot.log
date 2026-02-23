@@ -1,0 +1,82 @@
+2026-02-24 01:32:01 | INFO     | [queue] запущено 5 воркеров
+2026-02-24 01:32:01 | INFO     | =======================================================
+2026-02-24 01:32:01 | INFO     | 🤖 Universal Video Downloader запущен
+2026-02-24 01:32:01 | INFO     |    Воркеров: 5
+2026-02-24 01:32:01 | INFO     |    Реклама каждые: 3 загрузок
+2026-02-24 01:32:01 | INFO     |    Кэш TTL: 24ч
+2026-02-24 01:32:01 | INFO     |    Подписка: вкл
+2026-02-24 01:32:01 | INFO     | =======================================================
+2026-02-24 01:32:06 | INFO     | [/start] user=1062572445 @hybikroot
+2026-02-24 01:32:47 | INFO     | [admin] рассылка #1 создана lang=ru send_at=None
+2026-02-24 01:33:01 | INFO     | [broadcast] начало #1 lang=ru
+2026-02-24 01:33:02 | INFO     | [broadcast] #1 завершена: 2 доставлено, 0 ошибок
+2026-02-24 01:33:34 | INFO     | [yt-dlp] url=https://youtube.com/shorts/e8Tl_J0YUIA?si=Ex0TpiFmjmBHI7KV quality=hd
+2026-02-24 01:33:43 | INFO     | [yt-dlp] ✓ C:\Users\hybas\PycharmProjects\UniversalVideoDownloader\downloads\e8Tl_J0YUIA.mp4
+2026-02-24 01:33:45 | INFO     | [dl] user=8471436131 OK 3.5MB
+2026-02-24 01:34:14 | INFO     | [yt-dlp] url=https://www.youtube.com/watch?v=vYyLL9QstbI quality=sd
+2026-02-24 01:34:20 | INFO     | [yt-dlp] ✓ C:\Users\hybas\PycharmProjects\UniversalVideoDownloader\downloads\vYyLL9QstbI.mp4
+2026-02-24 01:34:22 | INFO     | [dl] user=8471436131 OK 1.3MB
+2026-02-24 01:34:49 | INFO     | [yt-dlp] url=https://www.youtube.com/shorts/EhggN6wj9CM quality=hd
+2026-02-24 01:34:56 | INFO     | [yt-dlp] ✓ C:\Users\hybas\PycharmProjects\UniversalVideoDownloader\downloads\EhggN6wj9CM.mp4
+2026-02-24 01:34:56 | INFO     | [dl] user=8471436131 OK 2.3MB
+2026-02-24 01:37:47 | INFO     | [queue] запущено 5 воркеров
+2026-02-24 01:37:47 | INFO     | =======================================================
+2026-02-24 01:37:47 | INFO     | 🤖 Universal Video Downloader запущен
+2026-02-24 01:37:47 | INFO     |    Воркеров: 5
+2026-02-24 01:37:47 | INFO     |    Реклама каждые: 3 загрузок
+2026-02-24 01:37:47 | INFO     |    Кэш TTL: 24ч
+2026-02-24 01:37:47 | INFO     |    Подписка: выкл
+2026-02-24 01:37:47 | INFO     | =======================================================
+2026-02-24 01:37:52 | INFO     | [yt-dlp] url=https://www.youtube.com/shorts/EhggN6wj9CM quality=hd
+2026-02-24 01:38:00 | INFO     | [yt-dlp] ✓ C:\Users\hybas\PycharmProjects\UniversalVideoDownloader\downloads\EhggN6wj9CM.mp4
+2026-02-24 01:38:01 | INFO     | [dl] user=8471436131 OK 2.3MB
+2026-02-24 01:38:01 | ERROR    | [dl] send error user=8471436131: 'sqlite3.Row' object has no attribute 'get'
+Traceback (most recent call last):
+  File "C:\Users\hybas\PycharmProjects\UniversalVideoDownloader\handlers\user.py", line 355, in _do_download
+    await ads_svc.maybe_show(bot, callback.message.chat.id, uid)
+  File "C:\Users\hybas\PycharmProjects\UniversalVideoDownloader\services\ads.py", line 30, in maybe_show
+    total_dl = user.get("total_downloads", 0)
+               ^^^^^^^^
+AttributeError: 'sqlite3.Row' object has no attribute 'get'
+2026-02-24 01:42:44 | INFO     | [queue] запущено 5 воркеров
+2026-02-24 01:42:44 | INFO     | =======================================================
+2026-02-24 01:42:44 | INFO     | 🤖 Universal Video Downloader запущен
+2026-02-24 01:42:44 | INFO     |    Воркеров: 5
+2026-02-24 01:42:44 | INFO     |    Реклама каждые: 3 загрузок
+2026-02-24 01:42:44 | INFO     |    Кэш TTL: 24ч
+2026-02-24 01:42:44 | INFO     |    Подписка: выкл
+2026-02-24 01:42:44 | INFO     | =======================================================
+2026-02-24 01:42:49 | INFO     | [yt-dlp] url=https://www.youtube.com/watch?v=vYyLL9QstbI quality=hd
+2026-02-24 01:42:56 | INFO     | [yt-dlp] ✓ C:\Users\hybas\PycharmProjects\UniversalVideoDownloader\downloads\vYyLL9QstbI.mp4
+2026-02-24 01:42:58 | INFO     | [dl] user=8471436131 OK 1.4MB
+2026-02-24 01:42:59 | ERROR    | [dl] send error user=8471436131: 'sqlite3.Row' object has no attribute 'get'
+Traceback (most recent call last):
+  File "C:\Users\hybas\PycharmProjects\UniversalVideoDownloader\handlers\user.py", line 355, in _do_download
+    await ads_svc.maybe_show(bot, callback.message.chat.id, uid)
+  File "C:\Users\hybas\PycharmProjects\UniversalVideoDownloader\services\ads.py", line 29, in maybe_show
+    total = user.get("total_downloads", 0)
+            ^^^^^^^^
+AttributeError: 'sqlite3.Row' object has no attribute 'get'
+2026-02-24 01:44:08 | INFO     | [queue] запущено 5 воркеров
+2026-02-24 01:44:08 | INFO     | =======================================================
+2026-02-24 01:44:08 | INFO     | 🤖 Universal Video Downloader запущен
+2026-02-24 01:44:08 | INFO     |    Воркеров: 5
+2026-02-24 01:44:08 | INFO     |    Реклама каждые: 3 загрузок
+2026-02-24 01:44:08 | INFO     |    Кэш TTL: 24ч
+2026-02-24 01:44:08 | INFO     |    Подписка: выкл
+2026-02-24 01:44:08 | INFO     | =======================================================
+2026-02-24 01:44:18 | INFO     | [yt-dlp] url=https://www.youtube.com/shorts/EhggN6wj9CM quality=sd
+2026-02-24 01:44:25 | INFO     | [yt-dlp] ✓ C:\Users\hybas\PycharmProjects\UniversalVideoDownloader\downloads\EhggN6wj9CM.mp4
+2026-02-24 01:44:26 | INFO     | [dl] user=8471436131 OK 1.1MB
+2026-02-24 01:44:26 | INFO     | [ad] check user=8471436131 total_dl=12 every_n=3 mod=0
+2026-02-24 01:44:26 | INFO     | [ad] ✅ id=1 'Чугун' → user=8471436131
+2026-02-24 01:44:33 | INFO     | [yt-dlp] url=https://www.youtube.com/watch?v=vYyLL9QstbI quality=sd
+2026-02-24 01:44:40 | INFO     | [yt-dlp] ✓ C:\Users\hybas\PycharmProjects\UniversalVideoDownloader\downloads\vYyLL9QstbI.mp4
+2026-02-24 01:44:42 | INFO     | [dl] user=8471436131 OK 1.3MB
+2026-02-24 01:44:42 | INFO     | [ad] check user=8471436131 total_dl=13 every_n=3 mod=1
+2026-02-24 01:44:49 | INFO     | [yt-dlp] url=https://youtube.com/shorts/e8Tl_J0YUIA?si=Ex0TpiFmjmBHI7KV quality=sd
+2026-02-24 01:44:57 | INFO     | [yt-dlp] ✓ C:\Users\hybas\PycharmProjects\UniversalVideoDownloader\downloads\e8Tl_J0YUIA.mp4
+2026-02-24 01:44:58 | INFO     | [dl] user=8471436131 OK 1.5MB
+2026-02-24 01:44:58 | INFO     | [ad] check user=8471436131 total_dl=14 every_n=3 mod=2
+2026-02-24 01:45:02 | INFO     | [ad] check user=8471436131 total_dl=15 every_n=3 mod=0
+2026-02-24 01:45:02 | INFO     | [ad] ✅ id=1 'Чугун' → user=8471436131

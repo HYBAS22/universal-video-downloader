@@ -99,8 +99,6 @@ async def callback_about(callback: CallbackQuery):
     s = db.stats()
     await callback.message.edit_text(
         "ℹ️ <b>Universal Video Downloader</b>\n\n"
-        "⚙️ TikTok: API → yt-dlp fallback\n"
-        "⚙️ YouTube / Instagram / Twitter / VK: yt-dlp\n"
         f"👤 Пользователей: <b>{s['total']}</b>\n"
         f"📥 Загрузок сегодня: <b>{s['today_dl']}</b>\n\n"
         "💻 made by @hybikroot",
@@ -283,9 +281,9 @@ async def _do_download(bot: Bot, uid: int, url: str, platform: str,
         try:
             caption = t(uid, "cache_hit", platform=PLATFORM_NAMES.get(platform, platform), quality=label)
             if is_audio:
-                await callback.message.answer_audio(file_id, caption=caption)
+                await callback.message.answer_audio(file_id, caption=caption, parse_mode="HTML")
             else:
-                await callback.message.answer_video(file_id, caption=caption)
+                await callback.message.answer_video(file_id, caption=caption, parse_mode="HTML")
             await status_msg.delete()
             db.add_history(uid, platform, url, quality, 0)
             db.increment_downloads(uid)

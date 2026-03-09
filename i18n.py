@@ -5,7 +5,7 @@ import database as db
 STRINGS = {
     "ru": {
         "start":          "👋 <b>Привет, {name}!</b>\n\n🎥 Скачиваю видео с популярных платформ.\n\n<b>Платформы:</b>\n{platforms}\n\n📎 Просто отправь ссылку!",
-        "platforms":      "• TikTok\n• YouTube (включая Shorts)\n• Instagram Reels / Posts\n• Twitter / X\n• VK",
+        "platforms":      "• TikTok\n• YouTube (включая Shorts)\n• Instagram Reels / Posts\n• Twitter / X\n• VK\n• и любые другие сайты с видео",
         "send_link":      "📎 <b>Отправь ссылку на видео</b>\n\nПлатформы:\n{platforms}",
         "link_ok":        "✅ Ссылка получена!\n🌐 Платформа: <b>{platform}</b>\n\n🎬 Выбери качество:",
         "bad_link":       "❌ Не нашёл ссылку в сообщении.",
@@ -44,7 +44,7 @@ STRINGS = {
     },
     "en": {
         "start":          "👋 <b>Hey, {name}!</b>\n\n🎥 I download videos from popular platforms.\n\n<b>Platforms:</b>\n{platforms}\n\n📎 Send me a link!",
-        "platforms":      "• TikTok\n• YouTube (incl. Shorts)\n• Instagram Reels / Posts\n• Twitter / X\n• VK",
+        "platforms":      "• TikTok\n• YouTube (incl. Shorts)\n• Instagram Reels / Posts\n• Twitter / X\n• VK\n• and any other video site",
         "send_link":      "📎 <b>Send a video link</b>\n\nPlatforms:\n{platforms}",
         "link_ok":        "✅ Link received!\n🌐 Platform: <b>{platform}</b>\n\n🎬 Choose quality:",
         "bad_link":       "❌ No link found in your message.",

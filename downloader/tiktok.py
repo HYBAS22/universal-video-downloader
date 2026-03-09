@@ -1,5 +1,3 @@
-"""downloader/tiktok.py — TikTok через API (TikWM → TikMate → SSSTik)."""
-
 import re
 import logging
 import aiohttp

@@ -203,11 +203,6 @@ async def _handle_url(message: Message, state: FSMContext, bot: Bot):
         return
 
     platform = detect(url)
-    if not platform:
-        await message.answer(t(u.id, "bad_platform", platforms=t(u.id, "platforms")),
-                             parse_mode="HTML", reply_markup=main_kb(u.id, _is_admin(u.id)))
-        await state.clear()
-        return
 
     await state.update_data(url=url, platform=platform)
     await message.answer(

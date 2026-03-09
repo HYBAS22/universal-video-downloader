@@ -1,5 +1,3 @@
-"""downloader/ytdlp.py — загрузка через yt-dlp."""
-
 import asyncio
 import logging
 import os

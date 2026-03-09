@@ -1,5 +1,3 @@
-"""downloader/router.py — роутер: выбирает метод загрузки по платформе."""
-
 import logging
 import re
 from downloader import tiktok, ytdlp
@@ -17,6 +15,7 @@ PLATFORM_PATTERNS = {
 PLATFORM_NAMES = {
     "tiktok": "TikTok", "youtube": "YouTube",
     "instagram": "Instagram", "twitter": "Twitter / X", "vk": "VK",
+    "other": "Other",
 }
 
 QUALITY_LABELS = {
@@ -25,11 +24,11 @@ QUALITY_LABELS = {
 }
 
 
-def detect(url: str) -> str | None:
+def detect(url: str) -> str:
     for p, pat in PLATFORM_PATTERNS.items():
         if re.search(pat, url, re.IGNORECASE):
             return p
-    return None
+    return "other"
 
 
 def extract_url(text: str) -> str | None:
@@ -39,8 +38,8 @@ def extract_url(text: str) -> str | None:
 
 async def download(url: str, platform: str, quality: str) -> tuple[str | None, str | None]:
     """
-    TikTok → API сначала, потом yt-dlp fallback.
-    Всё остальное → yt-dlp напрямую.
+    TikTok API сначала, потом yt-dlp fallback.
+    Всё остальное yt-dlp.
     """
     if platform == "tiktok":
         fp, err = await tiktok.download(url, quality)

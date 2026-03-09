@@ -9,7 +9,7 @@ PLATFORM_PATTERNS = {
     "youtube":   r'https?://(?:www\.)?(?:youtube\.com/(?:watch\?v=|shorts/)|youtu\.be/)\S+',
     "instagram": r'https?://(?:www\.)?instagram\.com/(?:p|reel|tv)/\S+',
     "twitter":   r'https?://(?:www\.)?(?:twitter|x)\.com/\S+/status/\d+',
-    "vk":        r'https?://(?:www\.)?vk\.(?:com|ru)/(?:video|clip)\S+',
+    "vk":        r'https?://(?:www\.)?(?:vk\.com|vk\.ru|vkvideo\.ru)/(?:video|clip)\S+',
 }
 
 PLATFORM_NAMES = {

@@ -21,8 +21,11 @@ async def download(url: str, quality: str = "hd") -> tuple[str | None, str | Non
     base_cmd = [
         "yt-dlp", "-f", fmt,
         "--no-playlist", "--no-warnings",
+        "-q",  # <--- КРИТИЧНО: отключает лишний прогресс-бар и мусор в stdout
+        "--progress", # Позволяет внутренним механизмам работать, но quiet задушит вывод
         "--socket-timeout", "30", "--retries", "3",
-        "-o", out, "--print", "after_move:filepath",
+        "-o", out, 
+        "--print", "after_move:filepath", # Выведет ТОЛЬКО путь к файлу
     ]
 
     if quality != "audio":
@@ -50,8 +53,24 @@ async def download(url: str, quality: str = "hd") -> tuple[str | None, str | Non
                 return None, "Заблокировано из-за авторских прав."
             return None, "yt-dlp не смог скачать."
 
-        filepath = stdout.decode(errors="replace").strip().splitlines()[-1].strip()
+        # Читаем все строки и ищем среди них ту, которая является реальным файлом
+        lines = [line.strip() for line in stdout.decode(errors="replace").splitlines() if line.strip()]
+        
+        filepath = None
+        for line in reversed(lines):  # Идем снизу вверх
+            if os.path.exists(line):  # Если строка — это существующий путь, мы нашли его!
+                filepath = line
+                break
+                
+        # Резервный вариант на случай, если --print вывел относительный путь или что-то сбоит
+        if not filepath and lines:
+            last_line = lines[-1]
+            if os.path.exists(os.path.join(DOWNLOAD_DIR, os.path.basename(last_line))):
+                filepath = os.path.join(DOWNLOAD_DIR, os.path.basename(last_line))
+
         if not filepath or not os.path.exists(filepath):
+            # Для отладки запишем в лог, что вообще прилетело от yt-dlp в stdout
+            log.error(f"[yt-dlp] Файл не найден. Стрипнутые строки stdout: {lines}")
             return None, "Файл не найден после загрузки."
 
         log.info(f"[yt-dlp] ✓ {filepath}")

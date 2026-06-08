@@ -1,4 +1,4 @@
-"""handlers/user.py — все пользовательские обработчики."""
+"""handlers/user.py — все пользовательские обработчики с поддержкой миллисекунд."""
 
 import os
 import logging
@@ -234,21 +234,33 @@ QUALITY_MAP = {
     "quality_audio": "audio", "quality_watermark": "watermark",
 }
 
-
-def _parse_time(time_str: str) -> float | None:
-    """Парсит время в формате MM:SS или просто секунды."""
-    time_str = time_str.strip()
+def parse_time_to_seconds(text: str) -> float | None:
+    """
+    Парсит строку в секунды (float). 
+    Поддерживает форматы: '15', '15.450', '01:23', '01:23.450'
+    """
+    text = text.strip().replace(",", ".") # Заменяем запятую на точку на случай ввода '15,4'
     try:
-        if ":" in time_str:
-            parts = time_str.split(":")
-            if len(parts) != 2:
-                return None
+        # Случай 1: Просто число (секунды.миллисекунды) -> "15" или "15.45"
+        if ":" not in text:
+            return float(text)
+        
+        # Случай 2: Формат MM:SS или MM:SS.mmm
+        parts = text.split(":")
+        if len(parts) == 2:
             minutes = int(parts[0])
-            seconds = int(parts[1])
+            seconds = float(parts[1])
             return minutes * 60 + seconds
-        else:
-            return int(time_str)
-    except (ValueError, IndexError):
+            
+        # Случай 3: Формат HH:MM:SS.mmm (на всякий случай)
+        elif len(parts) == 3:
+            hours = int(parts[0])
+            minutes = int(parts[1])
+            seconds = float(parts[2])
+            return hours * 3600 + minutes * 60 + seconds
+            
+        return None
+    except ValueError:
         return None
 
 
@@ -270,7 +282,8 @@ async def cb_trim(callback: CallbackQuery, state: FSMContext):
 @router.message(States.trim_ask_start)
 async def process_trim_start(message: Message, state: FSMContext):
     uid = message.from_user.id
-    start_time = _parse_time(message.text or "")
+    # Используем правильную функцию парсинга для поддержки миллисекунд
+    start_time = parse_time_to_seconds(message.text or "")
     
     if start_time is None or start_time < 0:
         await message.answer(t(uid, "trim_format_err"), parse_mode="HTML")
@@ -286,7 +299,8 @@ async def process_trim_end(message: Message, state: FSMContext, bot: Bot):
     uid = message.from_user.id
     data = await state.get_data()
     
-    end_time = _parse_time(message.text or "")
+    # Используем правильную функцию парсинга для поддержки миллисекунд
+    end_time = parse_time_to_seconds(message.text or "")
     start_time = data.get("trim_start", 0)
     
     if end_time is None or end_time < 0:

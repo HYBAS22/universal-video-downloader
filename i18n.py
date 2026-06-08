@@ -49,7 +49,7 @@ STRINGS = {
         "trim_logic_err":  "❌ <b>Ошибка:</b> время окончания должно быть больше времени начала.",
         "trim_loading":    "✂️ <b>Обрезаю видео...</b>\n\nЭто может занять время...",
         "trim_fail":       "❌ <b>Не удалось обрезать видео</b>\n\nПричина: {reason}",
-        "trim_done":       "✅ <Видео обрезано!\n🎬 {quality}  ·  💾 {size} МБ",
+        "trim_done":       "✅ Видео обрезано!\n🎬 {quality}  ·  💾 {size} МБ",
     },
     "en": {
         "start":          "👋 <b>Hey, {name}!</b>\n\n🎥 I download videos from popular platforms.\n\n<b>Platforms:</b>\n{platforms}\n\n📎 Send me a link!",

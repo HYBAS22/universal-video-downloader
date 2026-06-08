@@ -627,16 +627,78 @@ async def admin_bc_time(message: Message, state: FSMContext):
 async def admin_users(callback: CallbackQuery, state: FSMContext):
     if not is_admin(callback.from_user.id):
         return
+    await state.clear()  # Сбрасываем стейт на случай, если зашли повторно
+    
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="📋 Список всех", callback_data="admin:users_list")],
+        *_back()
+    ])
+    
     await callback.message.edit_text(
         "👥 <b>Управление пользователями</b>\n\n"
-        "Введи <b>username, имя или ID</b> пользователя для поиска.\n\n"
-        "Например: <code>@username</code> или <code>123456789</code>",
+        "Введи <b>username, имя или ID</b> пользователя для поиска.\n"
+        "Либо нажми кнопку ниже, чтобы вывести список.\n\n"
+        "Например для поиска: <code>@username</code> или <code>123456789</code>",
         parse_mode="HTML",
-        reply_markup=InlineKeyboardMarkup(inline_keyboard=_back()),
+        reply_markup=kb,
     )
     await state.set_state(AdminStates.user_search)
     await callback.answer()
 
+@router.callback_query(F.data == "admin:users_list")
+async def admin_users_list(callback: CallbackQuery, state: FSMContext):
+    if not is_admin(callback.from_user.id):
+        return
+    await state.clear()
+    
+    # Предполагается, что пустой запрос или специальный метод возвращает всех.
+    # Если в db.search_users("") пустая строка не возвращает всех, 
+    # замените на db.get_all_users() или аналогичный метод вашей БД.
+    users = db.search_users("") 
+    
+    if not users:
+        await callback.message.edit_text(
+            "❌ Пользователи не найдены в базе данных.",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text="🔍 Искать", callback_data="admin:users")],
+                [InlineKeyboardButton(text="◀️ Назад", callback_data="admin:home")],
+            ])
+        )
+        await callback.answer()
+        return
+
+    text = f"📋 Всего пользователей в базе: <b>{len(users)}</b>\n\n"
+    kb_rows = []
+    
+    # Выводим список (ограничим первыми 20-30, чтобы не упасть по лимитам Telegram, если пользователей много)
+    for u in users[:30]:
+        ban_icon = "🚫" if u["is_banned"] else "👤"
+        uname = f"@{u['username']}" if u["username"] else "—"
+        text += f"{ban_icon} <b>{u['first_name']}</b> ({uname}) · ID: <code>{u['user_id']}</code> · 📥{u['total_downloads']}\n"
+        
+        # Кнопка быстрой блокировки/разблокировки прямо из списка
+        kb_rows.append([InlineKeyboardButton(
+            text=f"{'🔓 Разб.' if u['is_banned'] else '🚫 Заб.'} {u['first_name']}",
+            callback_data=f"admin:user_ban:{u['user_id']}:{1 if not u['is_banned'] else 0}"
+        )])
+
+    if len(users) > 30:
+        text += "\n<i>Показаны первые 30 пользователей...</i>"
+
+    kb_rows.append([InlineKeyboardButton(text="🔍 Поиск по ID/Имени", callback_data="admin:users")])
+    kb_rows += _back()
+
+    try:
+        await callback.message.edit_text(
+            text, 
+            parse_mode="HTML",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=kb_rows)
+        )
+    except TelegramBadRequest:
+        # На случай, если текст всё равно получился слишком длинным для одного сообщения
+        await callback.answer("⚠️ Список слишком большой для отображения!", show_alert=True)
+    else:
+        await callback.answer()
 
 @router.message(AdminStates.user_search)
 async def admin_user_search(message: Message, state: FSMContext):

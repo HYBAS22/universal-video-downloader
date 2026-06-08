@@ -41,6 +41,15 @@ STRINGS = {
         "btn_audio":      "🎵 Только аудио (.m4a)",
         "btn_cancel":     "❌ Отмена",
         "btn_subscribed": "✅ Я подписался",
+        # ---- Обрезка видео ----
+        "btn_trim":       "✂️ Обрезать видео",
+        "trim_ask_start":  "⏱️ <b>Отправь время начала обрезки</b>\n\nФормат: <code>MM:SS</code> или секунды\nПример: <code>00:15</code> или <code>15</code>",
+        "trim_ask_end":    "⏱️ <b>Отправь время окончания обрезки</b>\n\nФормат: <code>MM:SS</code> или секунды\nПример: <code>00:45</code> или <code>45</code>",
+        "trim_format_err": "❌ <b>Неверный формат.</b>\n\nИспользуй: <code>MM:SS</code> (00:15) или просто секунды (15)",
+        "trim_logic_err":  "❌ <b>Ошибка:</b> время окончания должно быть больше времени начала.",
+        "trim_loading":    "✂️ <b>Обрезаю видео...</b>\n\nЭто может занять время...",
+        "trim_fail":       "❌ <b>Не удалось обрезать видео</b>\n\nПричина: {reason}",
+        "trim_done":       "✅ <b>Видео обрезано!</b>\n🎬 {quality}  ·  💾 {size} МБ",
     },
     "en": {
         "start":          "👋 <b>Hey, {name}!</b>\n\n🎥 I download videos from popular platforms.\n\n<b>Platforms:</b>\n{platforms}\n\n📎 Send me a link!",
@@ -79,6 +88,15 @@ STRINGS = {
         "btn_audio":      "🎵 Audio only (.m4a)",
         "btn_cancel":     "❌ Cancel",
         "btn_subscribed": "✅ I subscribed",
+        # ---- Video trimming ----
+        "btn_trim":       "✂️ Trim video",
+        "trim_ask_start":  "⏱️ <b>Send trim start time</b>\n\nFormat: <code>MM:SS</code> or seconds\nExample: <code>00:15</code> or <code>15</code>",
+        "trim_ask_end":    "⏱️ <b>Send trim end time</b>\n\nFormat: <code>MM:SS</code> or seconds\nExample: <code>00:45</code> or <code>45</code>",
+        "trim_format_err": "❌ <b>Invalid format.</b>\n\nUse: <code>MM:SS</code> (00:15) or just seconds (15)",
+        "trim_logic_err":  "❌ <b>Error:</b> end time must be greater than start time.",
+        "trim_loading":    "✂️ <b>Trimming video...</b>\n\nThis may take a moment...",
+        "trim_fail":       "❌ <b>Failed to trim video</b>\n\nReason: {reason}",
+        "trim_done":       "✅ <b>Video trimmed!</b>\n🎬 {quality}  ·  💾 {size} MB",
     },
 }
 

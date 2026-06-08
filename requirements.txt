@@ -1,3 +1,4 @@
 aiogram
 aiohttp
 yt-dlp
+# Для работы обрезки видео требуется ffmpeg (установить отдельно: apt-get install ffmpeg или brew install ffmpeg)

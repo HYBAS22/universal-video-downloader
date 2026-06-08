@@ -6,6 +6,7 @@ import database as db
 import services.queue as queue_svc
 import services.ads as ads_svc
 import services.subscription as sub_svc
+import services.trimmer as trimmer_svc
 
 from aiogram import Router, Bot, F
 from aiogram.filters import Command, CommandStart
@@ -28,6 +29,8 @@ router = Router()
 class States(StatesGroup):
     waiting_for_url   = State()
     selecting_quality = State()
+    trim_ask_start    = State()
+    trim_ask_end      = State()
 
 
 # ─── Клавиатуры ──────────────────────────────────────────────────────────────
@@ -58,6 +61,7 @@ def quality_kb(uid: int, platform: str) -> InlineKeyboardMarkup:
         rows.append([InlineKeyboardButton(text=t(uid, "btn_wm"), callback_data="quality_watermark")])
     if platform == "youtube":
         rows.append([InlineKeyboardButton(text=t(uid, "btn_audio"), callback_data="quality_audio")])
+    rows.append([InlineKeyboardButton(text=t(uid, "btn_trim"), callback_data="trim")])
     rows.append([InlineKeyboardButton(text=t(uid, "btn_cancel"), callback_data="cancel")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
@@ -231,6 +235,86 @@ QUALITY_MAP = {
 }
 
 
+def _parse_time(time_str: str) -> float | None:
+    """Парсит время в формате MM:SS или просто секунды."""
+    time_str = time_str.strip()
+    try:
+        if ":" in time_str:
+            parts = time_str.split(":")
+            if len(parts) != 2:
+                return None
+            minutes = int(parts[0])
+            seconds = int(parts[1])
+            return minutes * 60 + seconds
+        else:
+            return int(time_str)
+    except (ValueError, IndexError):
+        return None
+
+
+@router.callback_query(F.data == "trim")
+async def cb_trim(callback: CallbackQuery, state: FSMContext):
+    uid = callback.from_user.id
+    data = await state.get_data()
+    
+    if not data.get("url"):
+        await callback.answer("❌", show_alert=True)
+        await state.clear()
+        return
+    
+    await callback.message.edit_text(t(uid, "trim_ask_start"), parse_mode="HTML")
+    await state.set_state(States.trim_ask_start)
+    await callback.answer()
+
+
+@router.message(States.trim_ask_start)
+async def process_trim_start(message: Message, state: FSMContext):
+    uid = message.from_user.id
+    start_time = _parse_time(message.text or "")
+    
+    if start_time is None or start_time < 0:
+        await message.answer(t(uid, "trim_format_err"), parse_mode="HTML")
+        return
+    
+    await state.update_data(trim_start=start_time)
+    await message.answer(t(uid, "trim_ask_end"), parse_mode="HTML")
+    await state.set_state(States.trim_ask_end)
+
+
+@router.message(States.trim_ask_end)
+async def process_trim_end(message: Message, state: FSMContext, bot: Bot):
+    uid = message.from_user.id
+    data = await state.get_data()
+    
+    end_time = _parse_time(message.text or "")
+    start_time = data.get("trim_start", 0)
+    
+    if end_time is None or end_time < 0:
+        await message.answer(t(uid, "trim_format_err"), parse_mode="HTML")
+        return
+    
+    if end_time <= start_time:
+        await message.answer(t(uid, "trim_logic_err"), parse_mode="HTML")
+        return
+    
+    url = data.get("url")
+    platform = data.get("platform", "unknown")
+    
+    status_msg = await message.answer(t(uid, "trim_loading"), parse_mode="HTML")
+    await state.clear()
+    
+    async def task():
+        await _do_trim(bot, uid, url, platform, start_time, end_time, status_msg, message)
+    
+    ok = await queue_svc.enqueue_and_wait(task, timeout=300)
+    if not ok:
+        try:
+            await status_msg.edit_text(t(uid, "queue_timeout"),
+                                      reply_markup=main_kb(uid, _is_admin(uid)))
+        except Exception:
+            pass
+
+
 @router.callback_query(F.data.startswith("quality_"))
 async def process_quality(callback: CallbackQuery, state: FSMContext, bot: Bot):
     quality  = QUALITY_MAP.get(callback.data, "hd")
@@ -265,6 +349,104 @@ async def process_quality(callback: CallbackQuery, state: FSMContext, bot: Bot):
                                        reply_markup=main_kb(uid, _is_admin(uid)))
         except Exception:
             pass
+
+
+async def _do_trim(bot: Bot, uid: int, url: str, platform: str,
+                   start_time: float, end_time: float, status_msg, message: Message):
+    """Обрезает скачанное видео."""
+    filepath = None
+    trimmed_path = None
+    
+    try:
+        # Кэш
+        cached = db.cache_get(url)
+        if not cached:
+            # Нужно сначала скачать
+            filepath, error = await download(url, platform, "hd")
+            if error or not filepath:
+                log.warning(f"[trim] user={uid} download FAIL: {error}")
+                try:
+                    await status_msg.edit_text(
+                        t(uid, "dl_fail", reason=error or "?"),
+                        reply_markup=main_kb(uid, _is_admin(uid)), parse_mode="HTML"
+                    )
+                except Exception:
+                    pass
+                return
+        else:
+            file_id, is_audio = cached
+            # Кэшированный file_id — нужно скачать с помощью telegram
+            # Но это сложно, поэтому скачиваем заново с сайта
+            filepath, error = await download(url, platform, "hd")
+            if error or not filepath:
+                try:
+                    await status_msg.edit_text(
+                        t(uid, "dl_fail", reason=error or "?"),
+                        reply_markup=main_kb(uid, _is_admin(uid)), parse_mode="HTML"
+                    )
+                except Exception:
+                    pass
+                return
+        
+        # Обрезаем видео
+        trimmed_path, trim_error = await trimmer_svc.trim_video(
+            filepath, start_time, end_time
+        )
+        
+        if trim_error or not trimmed_path:
+            log.warning(f"[trim] user={uid} FAIL: {trim_error}")
+            try:
+                await status_msg.edit_text(
+                    t(uid, "trim_fail", reason=trim_error or "?"),
+                    reply_markup=main_kb(uid, _is_admin(uid)), parse_mode="HTML"
+                )
+            except Exception:
+                pass
+            return
+        
+        size_mb = os.path.getsize(trimmed_path) / 1024 / 1024
+        
+        if size_mb > MAX_FILE_MB:
+            await status_msg.edit_text(
+                t(uid, "too_big", size=f"{size_mb:.1f}"),
+                reply_markup=main_kb(uid, _is_admin(uid)), parse_mode="HTML"
+            )
+            return
+        
+        await status_msg.edit_text(t(uid, "sending"), parse_mode="HTML")
+        caption = t(uid, "trim_done", quality="Trimmed", size=f"{size_mb:.1f}")
+        
+        file_input = FSInputFile(trimmed_path)
+        await message.answer_video(file_input, caption=caption)
+        
+        db.increment_downloads(uid)
+        log.info(f"[trim] user={uid} OK {size_mb:.1f}MB")
+        
+        try:
+            await status_msg.delete()
+        except TelegramBadRequest:
+            pass
+        
+        await ads_svc.maybe_show(bot, message.chat.id, uid)
+    
+    except Exception as e:
+        log.exception(f"[trim] send error user={uid}: {e}")
+        try:
+            await status_msg.edit_text(t(uid, "send_fail"),
+                                      reply_markup=main_kb(uid, _is_admin(uid)), parse_mode="HTML")
+        except Exception:
+            pass
+    finally:
+        if filepath and os.path.exists(filepath):
+            try:
+                os.remove(filepath)
+            except Exception:
+                pass
+        if trimmed_path and os.path.exists(trimmed_path):
+            try:
+                os.remove(trimmed_path)
+            except Exception:
+                pass
 
 
 async def _do_download(bot: Bot, uid: int, url: str, platform: str,

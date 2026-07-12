@@ -33,7 +33,7 @@ class States(StatesGroup):
     trim_ask_end      = State()
 
 
-# ─── Клавиатуры ──────────────────────────────────────────────────────────────
+# Клавиатуры
 
 def main_kb(uid: int, is_admin: bool = False) -> InlineKeyboardMarkup:
     rows = [
@@ -70,7 +70,7 @@ def _is_admin(uid: int) -> bool:
     return uid in ADMIN_IDS
 
 
-# ─── /start, /help ───────────────────────────────────────────────────────────
+# /start, /help
 
 @router.message(CommandStart())
 async def cmd_start(message: Message):
@@ -137,7 +137,7 @@ async def check_sub(callback: CallbackQuery, bot: Bot):
     await callback.answer()
 
 
-# ─── История ─────────────────────────────────────────────────────────────────
+# История
 
 @router.message(Command("history"))
 @router.callback_query(F.data == "history")
@@ -166,7 +166,7 @@ async def show_history(event: Message | CallbackQuery):
                            disable_web_page_preview=True)
 
 
-# ─── Обработка URL ───────────────────────────────────────────────────────────
+# Обработка URL
 
 @router.callback_query(F.data == "download")
 async def cb_download(callback: CallbackQuery, state: FSMContext):
@@ -227,7 +227,7 @@ async def handle_direct_url(message: Message, state: FSMContext, bot: Bot):
     await _handle_url(message, state, bot)
 
 
-# ─── Выбор качества → очередь → скачивание ───────────────────────────────────
+# Выбор качества → очередь → скачивание
 
 QUALITY_MAP = {
     "quality_hd": "hd", "quality_sd": "sd",

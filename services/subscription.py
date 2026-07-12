@@ -4,7 +4,7 @@ import logging
 import database as db
 from aiogram import Bot
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-from i18n import t, t_sub_req                          # ← добавлен t_sub_req
+from i18n import t, t_sub_req
 
 log = logging.getLogger("bot")
 
@@ -48,9 +48,8 @@ async def require(bot: Bot, message: Message) -> bool:
         )
     ])
 
-    # ─── ИСПРАВЛЕНО: вместо t(uid, "sub_req", ...) ───
     await message.answer(
-        t_sub_req(uid, channels_text, len(channels)),   # ← вот эта строка
+        t_sub_req(uid, channels_text, len(channels)),
         parse_mode="HTML",
         reply_markup=InlineKeyboardMarkup(inline_keyboard=buttons),
     )

@@ -18,23 +18,22 @@ async def maybe_show(bot: Bot, chat_id: int, user_id: int):
         log.debug(f"[ad] skip: ad_every_n=0 (выключено)")
         return
 
-    # ── FIX: берём total_downloads из таблицы users ──────────────
-    #    Раньше: db.get_daily_count(user_id) → всегда 0
-    #    Теперь: db.get_user() → total_downloads (обновляется increment_downloads)
+    # FIX: берём total_downloads из таблицы users
+    # Раньше: db.get_daily_count(user_id) → всегда 0
+    # Теперь: db.get_user() → total_downloads (обновляется increment_downloads)
     user = db.get_user(user_id)
     if not user:
         log.debug(f"[ad] skip: user={user_id} не найден")
         return
 
     total = user["total_downloads"]
-    log.info(                                                       # ← INFO, не DEBUG
+    log.info(
         f"[ad] check user={user_id} total_dl={total} "
         f"every_n={every_n} mod={total % every_n}"
     )
 
     if total == 0 or total % every_n != 0:
         return
-    # ─────────────────────────────────────────────────────────────
 
     ads = db.get_ads(enabled_only=True)
     if not ads:
@@ -58,6 +57,6 @@ async def maybe_show(bot: Bot, chat_id: int, user_id: int):
             disable_web_page_preview=False,
         )
         db.increment_ad_shows(ad["id"])
-        log.info(f"[ad] ✅ id={ad['id']} '{ad['title']}' → user={user_id}")  # ← INFO
+        log.info(f"[ad] ✅ id={ad['id']} '{ad['title']}' → user={user_id}")
     except Exception as e:
         log.warning(f"[ad] ошибка отправки: {e}")

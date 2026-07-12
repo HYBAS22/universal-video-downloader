@@ -35,7 +35,7 @@ log = logging.getLogger("bot")
 router = Router()
 
 
-# ─── FSM для создания объектов из панели ─────────────────────────────────────
+# FSM для создания объектов из панели
 
 class AdminStates(StatesGroup):
     # Каналы
@@ -57,13 +57,13 @@ class AdminStates(StatesGroup):
     setting_edit = State()
 
 
-# ─── Фильтр: только для админов ──────────────────────────────────────────────
+# Фильтр: только для админов
 
 def is_admin(uid: int) -> bool:
     return uid in ADMIN_IDS
 
 
-# ─── Вспомогательные клавиатуры ──────────────────────────────────────────────
+# Вспомогательные клавиатуры
 
 def _back(section: str = "home") -> list:
     return [[InlineKeyboardButton(text="◀️ Назад", callback_data=f"admin:{section}")]]
@@ -81,7 +81,7 @@ def home_kb() -> InlineKeyboardMarkup:
     ])
 
 
-# ─── Открытие панели ─────────────────────────────────────────────────────────
+# Открытие панели
 
 @router.message(Command("admin"))
 async def cmd_admin(message: Message):
@@ -118,9 +118,7 @@ async def admin_close(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  📊 СТАТИСТИКА
-# ══════════════════════════════════════════════════════════════════════════════
+# СТАТИСТИКА
 
 @router.callback_query(F.data == "admin:stats")
 async def admin_stats(callback: CallbackQuery):
@@ -154,9 +152,7 @@ async def admin_stats(callback: CallbackQuery):
     await callback.answer()
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  📢 КАНАЛЫ ПОДПИСКИ
-# ══════════════════════════════════════════════════════════════════════════════
+# КАНАЛЫ ПОДПИСКИ
 
 def _channels_kb() -> InlineKeyboardMarkup:
     channels = db.get_channels()
@@ -227,7 +223,7 @@ async def admin_ch_del(callback: CallbackQuery):
     await admin_channels(callback)
 
 
-# Добавление канала — 3 шага
+# Добавление канала
 
 @router.callback_query(F.data == "admin:ch_add")
 async def admin_ch_add_start(callback: CallbackQuery, state: FSMContext):
@@ -284,9 +280,7 @@ async def admin_ch_add_url(message: Message, state: FSMContext, bot: Bot):
     )
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  📣 РЕКЛАМА
-# ══════════════════════════════════════════════════════════════════════════════
+# РЕКЛАМА
 
 def _ads_kb() -> InlineKeyboardMarkup:
     ads = db.get_ads()
@@ -372,7 +366,7 @@ async def admin_ad_del(callback: CallbackQuery):
     await admin_ads(callback)
 
 
-# Добавление объявления — диалог
+# Добавление объявления
 
 @router.callback_query(F.data == "admin:ad_add")
 async def admin_ad_add_start(callback: CallbackQuery, state: FSMContext):
@@ -443,9 +437,7 @@ async def admin_ad_add_button(message: Message, state: FSMContext):
     )
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  📬 РАССЫЛКИ
-# ══════════════════════════════════════════════════════════════════════════════
+# РАССЫЛКИ
 
 @router.callback_query(F.data == "admin:broadcasts")
 async def admin_broadcasts(callback: CallbackQuery):
@@ -491,7 +483,7 @@ async def admin_bc_cancel(callback: CallbackQuery):
     await admin_broadcasts(callback)
 
 
-# Создание рассылки — диалог из 4 шагов
+# Создание рассылки
 
 @router.callback_query(F.data == "admin:bc_create")
 async def admin_bc_start(callback: CallbackQuery, state: FSMContext):
@@ -619,15 +611,13 @@ async def admin_bc_time(message: Message, state: FSMContext):
     )
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  👥 ПОЛЬЗОВАТЕЛИ
-# ══════════════════════════════════════════════════════════════════════════════
+# ПОЛЬЗОВАТЕЛИ
 
 @router.callback_query(F.data == "admin:users")
 async def admin_users(callback: CallbackQuery, state: FSMContext):
     if not is_admin(callback.from_user.id):
         return
-    await state.clear()  # Сбрасываем стейт на случай, если зашли повторно
+    await state.clear() # Сбрасываем стейт на случай, если зашли повторно
     
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="📋 Список всех", callback_data="admin:users_list")],
@@ -750,9 +740,7 @@ async def admin_user_ban(callback: CallbackQuery):
     await admin_users(callback)
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  ⚙️ НАСТРОЙКИ
-# ══════════════════════════════════════════════════════════════════════════════
+# НАСТРОЙКИ
 
 SETTINGS_META = {
     "ad_every_n":      ("📣 Реклама каждые N загрузок",  "0 = выключено"),

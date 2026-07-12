@@ -98,16 +98,16 @@ def init():
 
 def _seed_defaults(db: sqlite3.Connection):
     defaults = {
-        "ad_every_n":       "3",     # реклама каждые N загрузок
+        "ad_every_n":       "3", # реклама каждые N загрузок
         "queue_workers":    "5",
         "cache_ttl_hours":  "24",
-        "sub_required":     "1",     # 0/1
+        "sub_required":     "1", # 0/1
     }
     for k, v in defaults.items():
         db.execute("INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)", (k, v))
 
 
-# ─── settings ────────────────────────────────────────────────────────────────
+# Настройки
 
 def get_setting(key: str, default=None) -> str | None:
     with conn() as db:
@@ -124,7 +124,7 @@ def get_all_settings() -> dict:
     return {r["key"]: r["value"] for r in rows}
 
 
-# ─── users ───────────────────────────────────────────────────────────────────
+# Юзеры
 
 def upsert_user(user_id: int, username: str | None, first_name: str | None):
     with conn() as db:
@@ -197,7 +197,7 @@ def stats() -> dict:
                 total_dl=total_dl, today_dl=today_dl, new_today=new_today)
 
 
-# ─── sub_channels ─────────────────────────────────────────────────────────────
+# Подканалы
 
 def get_channels(enabled_only: bool = False) -> list:
     with conn() as db:
@@ -221,7 +221,7 @@ def delete_channel(row_id: int):
         db.execute("DELETE FROM sub_channels WHERE id=?", (row_id,))
 
 
-# ─── ads ─────────────────────────────────────────────────────────────────────
+# Реклама
 
 def get_ads(enabled_only: bool = False) -> list:
     with conn() as db:
@@ -249,7 +249,7 @@ def increment_ad_shows(ad_id: int):
         db.execute("UPDATE ads SET shows=shows+1 WHERE id=?", (ad_id,))
 
 
-# ─── broadcasts ──────────────────────────────────────────────────────────────
+# Рассылка
 
 def create_broadcast(text: str, btn_text: str | None, btn_url: str | None,
                      target_lang: str, send_at: str | None) -> int:
@@ -283,7 +283,7 @@ def list_broadcasts(limit: int = 10) -> list:
         ).fetchall()
 
 
-# ─── history ─────────────────────────────────────────────────────────────────
+# История
 
 def add_history(user_id: int, platform: str, url: str, quality: str, size_mb: float):
     with conn() as db:
@@ -305,7 +305,7 @@ def get_history(user_id: int, limit: int = 10) -> list:
         ).fetchall()
 
 def get_daily_count(user_id: int) -> int:
-    today_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d")   # ← UTC, как в SQLite
+    today_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d") # UTC
     with conn() as db:
         return db.execute(
             "SELECT COUNT(*) FROM download_history WHERE user_id=? AND ts LIKE ?",
@@ -313,7 +313,7 @@ def get_daily_count(user_id: int) -> int:
         ).fetchone()[0]
 
 
-# ─── cache ───────────────────────────────────────────────────────────────────
+# Кэш
 
 def cache_get(url: str) -> tuple[str, bool] | None:
     key = str(hash(url))

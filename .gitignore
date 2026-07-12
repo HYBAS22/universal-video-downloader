@@ -2,3 +2,7 @@
 config.py
 /logs/bot.log
 /.idea/*
+.env
+*.db
+logs/
+downloads/

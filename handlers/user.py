@@ -57,8 +57,6 @@ def quality_kb(uid: int, platform: str) -> InlineKeyboardMarkup:
         InlineKeyboardButton(text=t(uid, "btn_hd"), callback_data="quality_hd"),
         InlineKeyboardButton(text=t(uid, "btn_sd"), callback_data="quality_sd"),
     ]]
-    if platform == "tiktok":
-        rows.append([InlineKeyboardButton(text=t(uid, "btn_wm"), callback_data="quality_watermark")])
     if platform == "youtube":
         rows.append([InlineKeyboardButton(text=t(uid, "btn_audio"), callback_data="quality_audio")])
     rows.append([InlineKeyboardButton(text=t(uid, "btn_trim"), callback_data="trim")])
